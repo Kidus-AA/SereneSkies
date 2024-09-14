@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx vite build"
+  },
+  "author": "Kidus Asmare Ayele",
+  "license": "ISC",
+  "description": "SereneSkies web application",
+  "dependencies": {
+    "three": "^0.168.0"
+  }
+}

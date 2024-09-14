@@ -1,8 +1,14 @@
 {
-  "type": "module",
+
+  "name": "test",
+  "version": "1.0.0",
   "scripts": {
     "start": "node src/server.js"
   },
+  "author": "Kidus Asmare Ayele",
+  "license": "ISC",
+  "description": "SereneSkies api application",
+  "type": "module",
   "dependencies": {
     "axios": "^1.7.7",
     "crypto": "^1.0.1",
