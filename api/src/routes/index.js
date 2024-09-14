@@ -1,5 +1,6 @@
-import { quotesRouter } from "./quotes";
+import express from 'express';
+import { quotesRouter } from './quotes.js';
 
-export const routes = {
-    quotesRouter
-}
+export const routes = express.Router();
+
+routes.use('/quotes', quotesRouter);
