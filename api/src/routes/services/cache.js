@@ -8,25 +8,6 @@ const options = {
 };
 
 export const cache = new LRUCache(options);
-
-export const setCache = async () => {
-    try {
-        cache.clear();
-        for(let i = 0; i < 5; i++) {
-            const {data: quotes} = await axios.get('https://stoic-quotes.com/api/quotes?num=100');
-            quotes.map(quote => {
-                const strinfiedQuote = JSON.stringify(quote);
-                const quoteHash = createHash('md5').update(strinfiedQuote).digest('hex');
-                cache.set(quoteHash, JSON.stringify(strinfiedQuote));
-            });
-        }
-        console.log(`Cache successfully set. Cache size: ${cache.size}`);
-    } catch (error) {
-        console.error('\nERROR: Failed to set cache\n', error);
-        throw new Error('Error setting cache')
-    }
-}
-
 export const getCachedQuote = async () => {
     try {
         if(cache.size <= 10) {
@@ -45,4 +26,21 @@ export const getCachedQuote = async () => {
     }
 }
 
+const setCache = async () => {
+    try {
+        cache.clear();
+        for(let i = 0; i < 5; i++) {
+            const {data: quotes} = await axios.get('https://stoic-quotes.com/api/quotes?num=100');
+            quotes.map(quote => {
+                const strinfiedQuote = JSON.stringify(quote);
+                const quoteHash = createHash('md5').update(strinfiedQuote).digest('hex');
+                cache.set(quoteHash, JSON.stringify(strinfiedQuote));
+            });
+        }
+        console.log(`Cache successfully set. Cache size: ${cache.size}`);
+    } catch (error) {
+        console.error('\nERROR: Failed to set cache\n', error);
+        throw new Error('Error setting cache')
+    }
+}
 setCache();
