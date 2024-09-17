@@ -1,80 +1,55 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import WebGL from 'three/addons/capabilities/WebGL.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 
-const globe = (scene) => {
-    const geometry = new THREE.SphereGeometry(2, 32, 16);
-    const material = new THREE.MeshLambertMaterial({ color: 0xffff00 });
-    const sphere = new THREE.Mesh(geometry, material);
+// Initialize scene, camera, renderer...
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
 
-    scene.add(sphere);
-    return sphere;
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x87CEEB); // Light blue background color
+document.body.appendChild(renderer.domElement);
+
+// Add ambient light
+const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft white light
+scene.add(ambientLight);
+
+// Add directional light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(1, 1, 1).normalize();
+scene.add(directionalLight);
+
+// Load the MTL file first, then load the OBJ file
+const mtlLoader = new MTLLoader();
+mtlLoader.load('/Users/kayele/Library/CloudStorage/OneDrive-UHG/Desktop/plans_2025/SereneSkies/web/public/models/airPlane.mlt', (materials) => {
+    materials.preload(); // Preload materials
+
+    const objLoader = new OBJLoader();
+    objLoader.setMaterials(materials); // Apply the materials to the OBJ loader
+
+    objLoader.load('/Users/kayele/Library/CloudStorage/OneDrive-UHG/Desktop/plans_2025/SereneSkies/web/public/models/airPlane.obj', (object) => {
+        object.scale.set(4, 4, 4); // Scale down the model if needed
+        object.position.set(0, 0, 0); // Center the model
+        scene.add(object);
+    }, undefined, (error) => {
+        console.error('An error occurred loading the OBJ model:', error);
+    });
+});
+
+// Animation loop...
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
 }
+animate();
 
-const plane = (scene) => {
-    const geometry = new THREE.CylinderGeometry(0, 1, 2, 8);
-    const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-    const plane = new THREE.Mesh(geometry, material);
-
-    plane.position.set(4, 0, 0);
-    plane.rotation.set(Math.PI / 2, 0, Math.PI);
-
-    scene.add(plane);
-    return plane;
-}
-
-const userMovement = ({ camera, plane }) => {
-}
-
-const setupScene = ({ scene, camera, controls }) => {
-    const globeObj = globe(scene);
-    const planeObj = plane(scene);
-
-    // controls.target.copy(planeObj.position);
-    camera.position.set(planeObj.position.x, planeObj.position.y, planeObj.position.z + 5);
-
-    // controls.enableDamping = true;
-    // controls.dampingFactor = 0.05;
-    // controls.screenSpacePanning = false;
-    // controls.minDistance = 0;
-    // controls.maxDistance = 20;
-    // controls.maxPolarAngle = Math.PI / 2;
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(0, 3, 0);
-    scene.add(directionalLight);
-
-    return { globeObj, planeObj };
-}
-
-const init = () => {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);    // can reduce resolution by half to improve performance
-    document.body.appendChild(renderer.domElement);
-
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.listenToKeyEvents(window);
-
-    const { globeObj, planeObj } = setupScene({ scene, camera });
-
-    function animate() {
-        renderer.render(scene, camera);
-    }
-    renderer.setAnimationLoop( animate );
-}
-
-// make the plane move
-// smoother movement from the plane
-// lighting
-    
-if (WebGL.isWebGL2Available()) {
-    init();
-} else {
-    const warning = WebGL.getWebGL2ErrorMessage();
-    document.body.appendChild(warning);
-}
+// Adjust camera and renderer on window resize
+window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+});

@@ -1,6 +1,5 @@
 {
-
-  "name": "test",
+  "name": "serene-skies-api",
   "version": "1.0.0",
   "scripts": {
     "start": "node src/server.js"
