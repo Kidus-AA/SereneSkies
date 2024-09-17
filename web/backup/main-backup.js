@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
-// procedural generation of a globe
+// procedural generation of a globe, yt tutorial: Irradiance
 
 const globe = (scene) => {
     const geometry = new THREE.SphereGeometry(2, 32, 16);
