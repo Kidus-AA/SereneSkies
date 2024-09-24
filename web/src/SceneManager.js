@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { AirPlane } from './sceneSubjects/AirPlane';
+import { SceneSubjects } from './sceneSubjects';
+// import { AirPlane } from './sceneSubjects/AirPlane';
 
 export const SceneManager = () => {
     const setupScene = () => {
@@ -33,7 +34,7 @@ export const SceneManager = () => {
     
     const createSceneSubjects = ({ scene }) => {
         const sceneSubjects = {
-            airPlane: AirPlane({ scene }),
+            airPlaneSubject: SceneSubjects.AirPlane({ scene }),
         };
 
         return sceneSubjects;
@@ -44,18 +45,22 @@ export const SceneManager = () => {
     const camera = setupCamera();
     const sceneSubjects = createSceneSubjects({ scene});
 
+    scene.add( new THREE.GridHelper() );
+    scene.add( new THREE.AxesHelper( 10 ) );
+
     const animate = () => {
-        const { airPlane } = sceneSubjects;
-        airPlane.animate();
-        const airPlaneMesh = airPlane.mesh();
+        const { airPlaneSubject } = sceneSubjects;
+        Object.keys(sceneSubjects).forEach((sceneSubject) => {
+            sceneSubjects[sceneSubject].animate();    
+        })
 
-        scene.add( new THREE.GridHelper() );
+        const airPlane = airPlaneSubject.mesh();
 
-        const offset = new THREE.Vector3(0, 4, 4);  // Position offset from the cube
-        offset.applyQuaternion(airPlaneMesh.quaternion);  // Rotate the offset with the cube's orientation
-        camera.position.copy(airPlaneMesh.position).add(offset);  // Set camera position relative to cube    
-        camera.lookAt(airPlaneMesh.position);
+        const offset = new THREE.Vector3(0, 4, 4);
+        offset.applyQuaternion(airPlane.quaternion);  // Rotate the offset with the cube's orientation
+        camera.position.copy(airPlane.position).add(offset);  // Set camera position relative to cube    
 
+        camera.lookAt(airPlane.position);
         renderer.render(scene, camera);
     }
 
