@@ -13,7 +13,8 @@ export const AirPlane = ({ scene }) => {
     const rotationXSpeed = 0.02;  // Controls the speed of upward rotation (S key)
     const flipThreshold = Math.PI / 2;  // Flip threshold for nose up or down
 
-    const geometry = new THREE.BoxGeometry();
+    const geometry = new THREE.CylinderGeometry( 0, 1, 3, 16 );
+    geometry.rotateY(Math.PI / 2);
     const material = new THREE.MeshBasicMaterial({ color: 0x1f00ff });
     const airPlane = new THREE.Mesh(geometry, material);
 
@@ -40,20 +41,26 @@ export const AirPlane = ({ scene }) => {
         airPlane.rotation.y += Math.sin(time) * 0.001;
 
         // Forward movement
-        if (keys.w) {
-            const forward = new THREE.Vector3(0, 0, -1);
-            forward.applyQuaternion(airPlane.quaternion);
-            forward.multiplyScalar(speed);
-            airPlane.position.add(forward);
+        const forward = new THREE.Vector3(0, 0, -1);
+        forward.applyQuaternion(airPlane.quaternion);
+        forward.multiplyScalar(speed);
+        airPlane.position.add(forward);
+
+        // Upwards movement
+        if(keys.w) {
+            airPlane.rotation.x = Math.max(airPlane.rotation.x - rotationXSpeed, -flipThreshold);  // Tilt upward but limit
         }
 
-        // Rotation and tilting when turning left (A) or right (D)
-        if (keys.a && keys.w) {
-            // Rotate left and tilt left
+        // Downwards movement
+        if(keys.s) {
+            airPlane.rotation.x = Math.min(airPlane.rotation.x + rotationXSpeed, flipThreshold);  // Tilt downward but limit
+        }
+
+        // Rotation and tilting when turning left or right
+        if (keys.a) {
             airPlane.rotation.y += rotationSpeed;
             airPlane.rotation.z = THREE.MathUtils.lerp(airPlane.rotation.z, Math.PI / 3, tiltSpeed); // Smooth left tilt
-        } else if (keys.d && keys.w) {
-            // Rotate right and tilt right
+        } else if (keys.d) {
             airPlane.rotation.y -= rotationSpeed;
             airPlane.rotation.z = THREE.MathUtils.lerp(airPlane.rotation.z, -Math.PI / 3, tiltSpeed); // Smooth right tilt
         } else {
@@ -65,8 +72,8 @@ export const AirPlane = ({ scene }) => {
     return { animate, mesh };
 }
 
+// Add event listeners for keydown and keyup
 const setEventListeners = ({ keys }) => {
-    // Add event listeners for keydown and keyup
     window.addEventListener('keydown', (event) => {
         switch (event.key.toLowerCase()) {
             case 'w':

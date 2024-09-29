@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCachedQuote } from './services/cache.js';
+import { getCachedQuote } from '../services/cache.js';
 
 export const quotesRouter = express.Router();
 
